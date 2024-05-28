@@ -1,0 +1,176 @@
+class Restaurant
+{
+    public string Name { get; set; }
+    public string Address { get; set; }
+    public string Type { get; set; }
+    public double Rating { get; set; }
+    public List<Dish> Menu { get; set; }
+
+    public Restaurant(string name, string address, string type, double rating)
+    {
+        Name = name;
+        Address = address;
+        Type = type;
+        Rating = rating;
+        Menu = new List<Dish>();
+    }
+
+    public void AddDish(Dish dish)
+    {
+        Menu.Add(dish);
+    }
+
+    public void DisplayMenu()
+    {
+        Console.WriteLine($"Меню ресторану \"{Name}\":");
+        foreach (var dish in Menu)
+        {
+            Console.WriteLine($"Страва: {dish.Name}, Цiна: {dish.Price} грн");
+        }
+    }
+}
+
+class Dish
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public double Price { get; set; }
+
+    public Dish(string name, string description, double price)
+    {
+        Name = name;
+        Description = description;
+        Price = price;
+    }
+}
+
+class Courier
+{
+    public string Name { get; set; }
+    public string ContactInfo { get; set; }
+    public double Rating { get; set; }
+    public string TransportType { get; set; }
+
+    public Courier(string name, string contactInfo, double rating, string transportType)
+    {
+        Name = name;
+        ContactInfo = contactInfo;
+        Rating = rating;
+        TransportType = transportType;
+    }
+}
+
+class Client
+{
+    public string Name { get; set; }
+    public string DeliveryAddress { get; set; }
+    public string ContactNumber { get; set; }
+    public List<Order> OrderHistory { get; set; }
+
+    public Client(string name, string deliveryAddress, string contactNumber)
+    {
+        Name = name;
+        DeliveryAddress = deliveryAddress;
+        ContactNumber = contactNumber;
+        OrderHistory = new List<Order>();
+    }
+}
+
+class Order
+{
+    public List<Dish> Items { get; set; }
+    public double TotalPrice { get; set; }
+    public string Status { get; set; }
+    public Restaurant RestaurantInfo { get; set; }
+    public Courier CourierInfo { get; set; }
+    public Client ClientInfo { get; set; }
+
+    public Order(List<Dish> items, Restaurant restaurantInfo, Client clientInfo)
+    {
+        Items = items;
+        TotalPrice = CalculateTotalPrice();
+        Status = "В обробцi";
+        RestaurantInfo = restaurantInfo;
+        ClientInfo = clientInfo;
+    }
+
+    private double CalculateTotalPrice()
+    {
+        double total = 0;
+        foreach (var item in Items)
+        {
+            total += item.Price;
+        }
+        return total;
+    }
+
+    public void DisplayOrderDetails()
+    {
+        Console.WriteLine($"Замовлення клiєнта {ClientInfo.Name}:");
+        Console.WriteLine($"Адреса доставки: {ClientInfo.DeliveryAddress}");
+        Console.WriteLine("Склад замовлення:");
+        foreach (var item in Items)
+        {
+            Console.WriteLine($"- {item.Name}: {item.Price} грн");
+        }
+        Console.WriteLine($"Загальна сума: {TotalPrice} грн");
+        Console.WriteLine($"Статус: {Status}");
+    }
+}
+
+class DeliveryManager
+{
+    public List<Courier> AvailableCouriers { get; set; }
+
+    public DeliveryManager(List<Courier> availableCouriers)
+    {
+        AvailableCouriers = availableCouriers;
+    }
+
+    public Courier ChooseCourier()
+    {
+        return AvailableCouriers[0];
+    }
+
+    public void TrackDelivery(Order order)
+    {
+        order.Status = "В доставцi";
+    }
+}
+class Program
+{
+    static void Main()
+    {
+        Restaurant restaurant1 = new Restaurant("McDonald's", "вул. Пса патрона, 19", "Фастфуд", 4.5);
+        Restaurant restaurant2 = new Restaurant("Domino`s Pizza", "вул. Решетника, 24", "Ресторан", 4.2);
+
+        restaurant1.AddDish(new Dish("Бiг Мaк", "Чiзбургер з двома котлетами", 100));
+        restaurant1.AddDish(new Dish("Нагетси", "Нiжнi курчатковi кусочки", 70));
+        restaurant2.AddDish(new Dish("Пеперонi Пiцa", "Пiца з пiкантним салямi", 110));
+        restaurant2.AddDish(new Dish("Баврська Пiцa", "Пiца з куркою та ковбасами", 140));
+
+        Courier courier1 = new Courier("Іван", "+88005553535", 4.8, "авто");
+        Courier courier2 = new Courier("Даніїл", "+0973707626", 4.6, "Мотоцикл");
+
+        Client client1 = new Client("Василь", "вул. Пса Патронв, 90", "+9876543210");
+        Client client2 = new Client("Микита", "пр. Посмакуєм перемогу, 3", "+9874647437");
+
+        List<Dish> orderItems1 = new List<Dish> { restaurant1.Menu[0], restaurant1.Menu[1] };
+        Order order1 = new Order(orderItems1, restaurant1, client1);
+
+        List<Dish> orderItems2 = new List<Dish> { restaurant2.Menu[0], restaurant2.Menu[1] };
+        Order order2 = new Order(orderItems2, restaurant2, client2);
+
+        DeliveryManager deliveryManager = new DeliveryManager(new List<Courier> { courier1, courier2 });
+
+        Courier chosenCourier1 = deliveryManager.ChooseCourier();
+        deliveryManager.TrackDelivery(order1);
+
+        Courier chosenCourier2 = deliveryManager.ChooseCourier();
+        deliveryManager.TrackDelivery(order2);
+
+        order1.DisplayOrderDetails();
+        order2.DisplayOrderDetails();
+        Console.ReadLine();
+    }
+}
